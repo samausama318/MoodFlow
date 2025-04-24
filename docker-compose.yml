@@ -1,0 +1,39 @@
+services:
+  moodflow-frontend:
+    build:
+      context: ./moodflow-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./moodflow-frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://server:5000/api
+    depends_on:
+      - server
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/moodflow
+      - JWT_SECRET=s3cr3t_k3y_f0r_m00dfl0w_2025_!@#$%^
+      - PORT=5000
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+volumes:
+  mongo-data:

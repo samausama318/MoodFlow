@@ -1,7 +1,8 @@
+//authController
+
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
-
-
+const bcrypt = require("bcrypt");
 
 // إنشاء توكن
 const generateToken = (id) => {
@@ -15,7 +16,10 @@ const registerUser = async (req, res) => {
     const userExists = await User.findOne({ username });
     if (userExists) return res.status(400).json({ message: 'Username already exists' });
 
-    const newUser = await User.create({ username, password });
+    // تشفير كلمة المرور
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await User.create({ username, password: hashedPassword });
     const token = generateToken(newUser._id);
 
     res.status(201).json({ user: newUser.username, token });

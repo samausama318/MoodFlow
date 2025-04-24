@@ -1,3 +1,5 @@
+//moodController
+
 const Mood = require("../models/Mood");
 
 // ✅ [GET] Get all moods
@@ -6,6 +8,7 @@ const getAllMoods = async (req, res) => {
     const moods = await Mood.find({ userId: req.userId }).sort({ date: -1 });
     res.status(200).json(moods);
   } catch (error) {
+    console.error("Error fetching moods:", error.message);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -13,21 +16,29 @@ const getAllMoods = async (req, res) => {
 // ✅ [POST] Add a new mood
 const addMood = async (req, res) => {
   try {
+    console.log("Request body:", req.body); // تسجيل بيانات الطلب
+
     const { mood, note } = req.body;
 
+    // التحقق من البيانات
     if (!mood) {
       return res.status(400).json({ message: "Mood is required" });
     }
 
+    // إنشاء المزاج الجديد
     const newMood = new Mood({
-      userId: req.userId,
+      userId: req.userId, // استخدم userId من التوكن
       mood,
       note,
     });
 
+    // حفظ المزاج
     const savedMood = await newMood.save();
+
+    console.log("Mood saved successfully:", savedMood); // تسجيل المزاج المحفوظ
     res.status(201).json({ message: "Mood added successfully", mood: savedMood });
   } catch (error) {
+    console.error("Error adding mood:", error.message);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -48,6 +59,7 @@ const updateMood = async (req, res) => {
 
     res.status(200).json(updatedMood);
   } catch (err) {
+    console.error("Error updating mood:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -66,6 +78,7 @@ const deleteMood = async (req, res) => {
 
     res.status(200).json({ message: "Mood deleted" });
   } catch (err) {
+    console.error("Error deleting mood:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -83,6 +96,7 @@ const getWeeklyMoods = async (req, res) => {
 
     res.status(200).json(moods);
   } catch (err) {
+    console.error("Error fetching weekly moods:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };
